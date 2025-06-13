@@ -13,19 +13,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BroadcastServer {
 
-    private static final Logger logger = LoggerFactory.getLogger("BroadcastServer");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("MM-dd HH:mm:ss");
+    private static final Logger LOGGER = LoggerFactory.getLogger("BroadcastServer");
 
     private final CopyOnWriteArrayList<PrintWriter> clientWriters = new CopyOnWriteArrayList<>();
 
     public void run(int port) {
         try (var serverSocket = new ServerSocket(port)) {
-            logger.info("Broadcast server is listening on port {}", port);
+            LOGGER.info("Broadcast server is listening on port {}", port);
 
             while (!serverSocket.isClosed()) {
                 new Thread(new ClientHandler(serverSocket.accept())).start();
             }
         } catch (IOException exception) {
-            logger.error("Broadcast server caught an exception", exception);
+            LOGGER.error("Broadcast server caught an exception", exception);
         }
     }
 
@@ -34,8 +35,6 @@ public class BroadcastServer {
     }
 
     private class ClientHandler implements Runnable {
-
-        private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("MM-dd HH:mm:ss");
 
         private final Socket socket;
 
@@ -46,7 +45,7 @@ public class BroadcastServer {
         }
 
         public void run() {
-            logger.info("Client connected from IP address {}.", socket.getInetAddress().getHostAddress());
+            LOGGER.info("Client connected from IP address {}.", socket.getInetAddress().getHostAddress());
 
             try (var in = new BufferedReader(new InputStreamReader(socket.getInputStream())); var out = this.out =
                     new PrintWriter(socket.getOutputStream(), true)) {
@@ -61,7 +60,7 @@ public class BroadcastServer {
                 }
             } catch (IOException ignored) {
             } finally {
-                logger.info("Client from {} has disconnected.", socket.getInetAddress().getHostAddress());
+                LOGGER.info("Client from {} has disconnected.", socket.getInetAddress().getHostAddress());
 
                 try {
                     socket.close();
