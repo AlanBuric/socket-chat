@@ -39,3 +39,5 @@ build/
 
 # Java
 *.jar
+# Flatten plugin (CI-friendly ${revision})
+.flattened-pom.xml
